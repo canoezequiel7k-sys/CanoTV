@@ -6,36 +6,45 @@ import android.content.pm.PackageManager
 class AppRepository(private val packageManager: PackageManager) {
 
     fun getLaunchableApps(excludedPackage: String): List<AppEntry> {
-        val seen = linkedSetOf<String>()
-        val apps = mutableListOf<AppEntry>()
-
-        val intents = listOf(
-            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
-            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        val appsByComponent = linkedMapOf<String, AppEntry>()
+        val categories = listOf(
+            Intent.CATEGORY_LEANBACK_LAUNCHER,
+            Intent.CATEGORY_LAUNCHER
         )
 
-        for (intent in intents) {
-            val resolveInfoList = packageManager.queryIntentActivities(intent, 0) ?: continue
-            for (resolveInfo in resolveInfoList) {
+        for (category in categories) {
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(category)
+            for (resolveInfo in packageManager.queryIntentActivities(intent, 0)) {
                 val packageName = resolveInfo.activityInfo.packageName
                 if (packageName == excludedPackage) continue
 
                 val activityName = resolveInfo.activityInfo.name
                 val key = "$packageName/$activityName"
-                if (!seen.add(key)) continue
+                if (key in appsByComponent) continue
 
                 val label = resolveInfo.loadLabel(packageManager).toString().ifBlank { packageName }
-                apps.add(
-                    AppEntry(
-                        packageName = packageName,
-                        activityName = activityName,
-                        label = label,
-                        icon = resolveInfo.loadIcon(packageManager)
-                    )
+                val bannerResource = resolveInfo.activityInfo.banner
+                    .takeIf { it != 0 }
+                    ?: resolveInfo.activityInfo.applicationInfo.banner
+                appsByComponent[key] = AppEntry(
+                    packageName = packageName,
+                    activityName = activityName,
+                    launchCategory = category,
+                    label = label,
+                    banner = if (bannerResource != 0) {
+                        packageManager.getDrawable(
+                            packageName,
+                            bannerResource,
+                            resolveInfo.activityInfo.applicationInfo
+                        )
+                    } else {
+                        null
+                    },
+                    icon = resolveInfo.loadIcon(packageManager)
                 )
             }
         }
 
-        return apps.sortedBy { it.label.lowercase() }
+        return appsByComponent.values.sortedBy { it.label.lowercase() }
     }
 }

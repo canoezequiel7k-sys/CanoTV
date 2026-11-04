@@ -37,51 +37,116 @@
             android:textSize="36sp"
             android:textStyle="bold" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="#2B3D69"
             android:gravity="center_vertical"
-            android:paddingStart="18dp"
-            android:text="Inicio"
-            android:textColor="#F4F6FF"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
 
-        <TextView
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_home"
+                android:tint="#F4F6FF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Inicio"
+                android:textColor="#F4F6FF"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:paddingStart="18dp"
-            android:text="Favoritos"
-            android:textColor="#D5DFEF"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
 
-        <TextView
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_star"
+                android:tint="#AEBBD0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Favoritos"
+                android:textColor="#D5DFEF"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:paddingStart="18dp"
-            android:text="Todas las apps"
-            android:textColor="#D5DFEF"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
 
-        <TextView
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_apps"
+                android:tint="#AEBBD0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Todas las apps"
+                android:textColor="#D5DFEF"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:paddingStart="18dp"
-            android:text="Configuración"
-            android:textColor="#D5DFEF"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
 
-        <TextView
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_settings"
+                android:tint="#AEBBD0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Configuración"
+                android:textColor="#D5DFEF"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center_vertical"
-            android:paddingStart="18dp"
-            android:text="Acerca de"
-            android:textColor="#D5DFEF"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_info"
+                android:tint="#AEBBD0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Acerca de"
+                android:textColor="#D5DFEF"
+                android:textSize="22sp" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -154,29 +219,22 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/appsRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="0dp"
             android:layout_marginTop="16dp"
+            android:layout_weight="1"
             android:clipToPadding="false"
             android:focusable="true"
             android:paddingEnd="8dp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:text="Recomendado para vos"
-            android:textColor="#F4F6FF"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recommendedRecyclerView"
+            android:id="@+id/emptyAppsMessage"
             android:layout_width="match_parent"
-            android:layout_height="190dp"
-            android:layout_marginTop="16dp"
-            android:clipToPadding="false"
-            android:focusable="true"
-            android:paddingEnd="8dp" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_launchable_apps"
+            android:textColor="#DCE8F7"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
