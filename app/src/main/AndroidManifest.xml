@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CanoTV">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
