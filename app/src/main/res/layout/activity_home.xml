@@ -38,9 +38,12 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/navHome"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="#2B3D69"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="18dp">
@@ -61,8 +64,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navFavorites"
             android:layout_width="match_parent"
             android:layout_height="52dp"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="18dp">
@@ -83,8 +90,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navAllApps"
             android:layout_width="match_parent"
             android:layout_height="52dp"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="18dp">
@@ -105,8 +116,38 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navStore"
             android:layout_width="match_parent"
             android:layout_height="52dp"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="18dp">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_store"
+                android:tint="#AEBBD0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/install_apps"
+                android:textColor="#D5DFEF"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navSettings"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="18dp">
@@ -127,8 +168,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navAbout"
             android:layout_width="match_parent"
             android:layout_height="52dp"
+            android:background="@drawable/nav_item_background"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="18dp">
@@ -208,19 +253,28 @@
             android:textSize="24sp" />
 
         <TextView
+            android:id="@+id/appsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="34dp"
-            android:text="Tus aplicaciones"
+            android:text="@string/apps_title"
             android:textColor="#F4F6FF"
             android:textSize="30sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/favorite_hint"
+            android:textColor="#B9C8DC"
+            android:textSize="14sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/appsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:clipToPadding="false"
             android:focusable="true"

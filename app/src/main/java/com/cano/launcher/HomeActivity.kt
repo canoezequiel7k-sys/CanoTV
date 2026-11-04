@@ -8,8 +8,10 @@ import android.content.ActivityNotFoundException
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.doOnNextLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,13 +21,18 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 class HomeActivity : AppCompatActivity() {
+    private enum class Section { HOME, FAVORITES, ALL }
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var adapter: AppAdapter
     private val repository by lazy { AppRepository(packageManager) }
+    private val favorites by lazy { FavoritesStore(this) }
+    private val settings by lazy { SettingsStore(this) }
     private val worker: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val loadGeneration = AtomicInteger()
+    private var allApps = emptyList<AppEntry>()
+    private var section = Section.HOME
     private var receiverRegistered = false
     private val refreshApps = Runnable { loadApps() }
     private val packageReceiver = object : BroadcastReceiver() {
@@ -40,10 +47,46 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = AppAdapter { app -> launchApp(app) }
+        adapter = AppAdapter(
+            onAppSelected = ::launchApp,
+            onFavoriteToggle = ::toggleFavorite
+        )
         binding.appsRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         binding.appsRecyclerView.adapter = adapter
         binding.appsRecyclerView.setHasFixedSize(true)
+
+        binding.navHome.setOnClickListener { showSection(Section.HOME) }
+        binding.navFavorites.setOnClickListener { showSection(Section.FAVORITES) }
+        binding.navAllApps.setOnClickListener { showSection(Section.ALL) }
+        binding.navStore.setOnClickListener { openAppStore() }
+        binding.navSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+        binding.navAbout.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.about_title)
+                .setMessage(R.string.about_message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
+        listOf(
+            binding.navHome,
+            binding.navFavorites,
+            binding.navAllApps,
+            binding.navStore,
+            binding.navSettings,
+            binding.navAbout
+        ).forEach { item ->
+            item.setOnKeyListener { _, keyCode, event ->
+                if (event.action == android.view.KeyEvent.ACTION_DOWN &&
+                    keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT
+                ) {
+                    focusFirstApp()
+                } else {
+                    false
+                }
+            }
+        }
     }
 
     override fun onStart() {
@@ -61,6 +104,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        section = if (settings.favoritesFirst) Section.HOME else Section.ALL
         loadApps()
     }
 
@@ -88,20 +132,116 @@ class HomeActivity : AppCompatActivity() {
             val apps = repository.getLaunchableApps(packageName)
             mainHandler.post {
                 if (!isFinishing && !isDestroyed && generation == loadGeneration.get()) {
-                    adapter.submitItems(apps)
-                    binding.emptyAppsMessage.visibility =
-                        if (apps.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
-                    val position = adapter.getSelectedPosition()
-                    if (position != RecyclerView.NO_POSITION) {
-                        binding.appsRecyclerView.scrollToPosition(position)
-                        binding.appsRecyclerView.doOnNextLayout {
-                            binding.appsRecyclerView.findViewHolderForAdapterPosition(position)
-                                ?.itemView?.requestFocus()
-                        }
-                    }
+                    allApps = apps
+                    favorites.removeMissingApps(apps)
+                    renderApps()
                 }
             }
         }
+    }
+
+    private fun renderApps() {
+        val favoriteKeys = favorites.getFavorites()
+        val visibleApps = when (section) {
+            Section.HOME -> if (settings.favoritesFirst) {
+                allApps.sortedByDescending { "${it.packageName}/${it.activityName}" in favoriteKeys }
+            } else {
+                allApps
+            }
+            Section.FAVORITES -> allApps.filter {
+                "${it.packageName}/${it.activityName}" in favoriteKeys
+            }
+            Section.ALL -> allApps
+        }
+        adapter.submitItems(visibleApps, favoriteKeys)
+        binding.emptyAppsMessage.visibility =
+            if (visibleApps.isEmpty()) View.VISIBLE else View.GONE
+        binding.emptyAppsMessage.setText(
+            if (section == Section.FAVORITES) R.string.no_favorites else R.string.no_launchable_apps
+        )
+        binding.appsTitle.setText(
+            when (section) {
+                Section.FAVORITES -> R.string.favorites_title
+                Section.ALL -> R.string.all_apps_title
+                Section.HOME -> R.string.apps_title
+            }
+        )
+        binding.navHome.isSelected = section == Section.HOME
+        binding.navFavorites.isSelected = section == Section.FAVORITES
+        binding.navAllApps.isSelected = section == Section.ALL
+        val position = adapter.getSelectedPosition()
+        if (position != RecyclerView.NO_POSITION) {
+            focusFirstApp(position)
+        }
+    }
+
+    private fun focusFirstApp(
+        position: Int = adapter.getSelectedPosition(),
+        retriesRemaining: Int = 4
+    ): Boolean {
+        if (position == RecyclerView.NO_POSITION) return false
+        binding.appsRecyclerView.scrollToPosition(position)
+        binding.appsRecyclerView.post {
+            val card = binding.appsRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
+            if (card != null) {
+                card.requestFocus()
+            } else if (retriesRemaining > 0) {
+                binding.appsRecyclerView.postDelayed(
+                    { focusFirstApp(position, retriesRemaining - 1) },
+                    50
+                )
+            } else {
+                binding.appsRecyclerView.doOnNextLayout {
+                    focusFirstApp(position, retriesRemaining - 1)
+                }
+            }
+        }
+        return true
+    }
+
+    private fun showSection(newSection: Section) {
+        section = newSection
+        renderApps()
+    }
+
+    private fun toggleFavorite(app: AppEntry): Boolean {
+        val added = favorites.toggle(app)
+        Toast.makeText(
+            this,
+            if (added) R.string.favorite_added else R.string.favorite_removed,
+            Toast.LENGTH_SHORT
+        ).show()
+        renderApps()
+        return true
+    }
+
+    private fun openAppStore() {
+        val store = allApps.firstOrNull {
+            it.packageName in setOf("com.android.vending", "com.xiaomi.mipicks", "com.xiaomi.market")
+        } ?: allApps.firstOrNull {
+            it.label.contains("play store", ignoreCase = true) ||
+                it.label.contains("app store", ignoreCase = true) ||
+                it.label.contains("getapps", ignoreCase = true) ||
+                it.label.contains("tienda", ignoreCase = true)
+        }
+        if (store != null) {
+            launchApp(store)
+            return
+        }
+
+        val fileManager = allApps.firstOrNull {
+            it.label.contains("explorador", ignoreCase = true) ||
+                it.label.contains("file manager", ignoreCase = true) ||
+                it.label.contains("files", ignoreCase = true)
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.store_unavailable_title)
+            .setMessage(R.string.store_unavailable_message)
+            .setNegativeButton(android.R.string.cancel, null)
+        if (fileManager != null) {
+            dialog.setPositiveButton(R.string.open_file_manager) { _, _ -> launchApp(fileManager) }
+        }
+        dialog.show()
     }
 
     private fun launchApp(app: AppEntry) {
@@ -117,6 +257,7 @@ class HomeActivity : AppCompatActivity() {
             loadApps()
         } catch (exception: SecurityException) {
             showLaunchError()
+            loadApps()
         }
     }
 
