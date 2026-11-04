@@ -36,4 +36,18 @@
     <string name="favorites_first_summary">Al iniciar, las aplicaciones favoritas aparecen antes que las demás.</string>
     <string name="favorite_hint">Mantén pulsado OK o pulsa Menú sobre una app para agregarla o quitarla de Favoritos.</string>
     <string name="back">Volver</string>
+    <string name="background_setting">Fondo de Inicio</string>
+    <string name="default_background_active">Fondo predeterminado activo</string>
+    <string name="custom_background_active">Fondo personalizado activo</string>
+    <string name="choose_background">Elegir imagen</string>
+    <string name="reset_background">Restaurar fondo</string>
+    <string name="image_picker_unavailable">El selector de imágenes no está disponible en este firmware.</string>
+    <string name="image_permission_failed">No se pudo conservar el acceso a esta imagen. Prueba otra ubicación.</string>
+    <string name="image_permission_denied">Se necesita permiso de lectura para elegir una imagen del dispositivo.</string>
+    <string name="background_load_failed">No se pudo cargar el fondo. Se restauró el fondo predeterminado.</string>
+    <string name="image_picker_title">Elegir imagen de fondo</string>
+    <string name="loading_images">Buscando imágenes…</string>
+    <string name="no_images_found">No se encontraron imágenes. Copia una imagen al dispositivo o a un pendrive y vuelve a intentar.</string>
+    <string name="unnamed_image">Imagen sin nombre</string>
+    <string name="cancel">Cancelar</string>
 </resources>

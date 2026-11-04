@@ -35,6 +35,36 @@
         android:textColor="#B9C8DC"
         android:textSize="18sp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/background_setting"
+        android:textColor="#F4F6FF"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/backgroundStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="#B9C8DC"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/chooseBackgroundButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/choose_background" />
+
+    <Button
+        android:id="@+id/resetBackgroundButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reset_background" />
+
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"

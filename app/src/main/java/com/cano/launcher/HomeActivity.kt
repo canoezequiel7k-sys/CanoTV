@@ -16,6 +16,7 @@ import androidx.core.view.doOnNextLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ActivityHomeBinding
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -31,6 +32,7 @@ class HomeActivity : AppCompatActivity() {
     private val worker: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val loadGeneration = AtomicInteger()
+    private val backgroundGeneration = AtomicInteger()
     private var allApps = emptyList<AppEntry>()
     private var section = Section.HOME
     private var receiverRegistered = false
@@ -101,6 +103,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         section = if (settings.favoritesFirst) Section.HOME else Section.ALL
+        loadBackground()
         loadApps()
     }
 
@@ -131,6 +134,37 @@ class HomeActivity : AppCompatActivity() {
                     allApps = apps
                     favorites.removeMissingApps(apps)
                     renderApps()
+                }
+            }
+        }
+    }
+
+    private fun loadBackground() {
+        val generation = backgroundGeneration.incrementAndGet()
+        val uri = settings.backgroundUri
+        if (uri == null) {
+            binding.homeBackground.setImageResource(R.drawable.home_bg)
+            return
+        }
+        val targetWidth = resources.displayMetrics.widthPixels
+        val targetHeight = resources.displayMetrics.heightPixels
+        worker.execute {
+            val bitmap = try {
+                BackgroundImage.decode(this, uri, targetWidth, targetHeight)
+            } catch (_: IOException) {
+                null
+            } catch (_: SecurityException) {
+                null
+            }
+            mainHandler.post {
+                if (!isFinishing && !isDestroyed && generation == backgroundGeneration.get()) {
+                    if (bitmap != null) {
+                        binding.homeBackground.setImageBitmap(bitmap)
+                    } else {
+                        settings.backgroundUri = null
+                        binding.homeBackground.setImageResource(R.drawable.home_bg)
+                        Toast.makeText(this, R.string.background_load_failed, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
