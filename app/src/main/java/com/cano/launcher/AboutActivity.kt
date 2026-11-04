@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.os.Build
 import android.os.Bundle
 import android.os.StatFs
+import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -14,11 +15,21 @@ import java.util.Locale
 
 class AboutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAboutBinding
+    private lateinit var palette: ThemePalette
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAboutBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        palette = ThemePalette.forId(
+            SettingsStore(this).themeId,
+            resources.displayMetrics.density
+        )
+        binding.aboutRoot.setBackgroundColor(palette.canvas)
+        binding.aboutTitle.setTextColor(palette.text)
+        binding.aboutMessage.setTextColor(palette.muted)
+        binding.backButton.backgroundTintList = ColorStateList.valueOf(palette.surfaceSelected)
+        binding.backButton.setTextColor(palette.text)
 
         val deviceName = listOf(Build.MANUFACTURER, Build.MODEL)
             .filter(String::isNotBlank)
@@ -52,7 +63,7 @@ class AboutActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(16, 5, 16, 5)
-            background = getDrawable(R.drawable.device_info_background)
+            background = palette.infoCardBackground()
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -62,12 +73,12 @@ class AboutActivity : AppCompatActivity() {
         }
         row.addView(TextView(this).apply {
             text = getString(labelRes)
-            setTextColor(getColor(R.color.device_info_label))
+            setTextColor(palette.muted)
             textSize = 12f
         })
         row.addView(TextView(this).apply {
             text = value.ifBlank { getString(R.string.unknown_value) }
-            setTextColor(getColor(R.color.device_info_value))
+            setTextColor(palette.text)
             textSize = 16f
         })
         binding.deviceInfoList.addView(row)

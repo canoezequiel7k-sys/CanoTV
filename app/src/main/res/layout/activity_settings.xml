@@ -3,12 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/settingsRoot"
     android:background="#0B1223"
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="48dp">
 
     <TextView
+        android:id="@+id/settingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/settings_title"
@@ -28,6 +30,7 @@
         app:useMaterialThemeColors="false" />
 
     <TextView
+        android:id="@+id/favoritesFirstSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -36,34 +39,45 @@
         android:textSize="18sp" />
 
     <TextView
+        android:id="@+id/themeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="@string/background_setting"
+        android:text="@string/theme_setting"
         android:textColor="#F4F6FF"
         android:textSize="22sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/backgroundStatus"
+    <RadioGroup
+        android:id="@+id/themeRadioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textColor="#B9C8DC"
-        android:textSize="18sp" />
+        android:layout_marginTop="4dp">
 
-    <Button
-        android:id="@+id/chooseBackgroundButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/choose_background" />
+        <RadioButton
+            android:id="@+id/themePurple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_purple"
+            android:textColor="#F4F6FF"
+            android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/resetBackgroundButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/reset_background" />
+        <RadioButton
+            android:id="@+id/themeSage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_sage"
+            android:textColor="#F4F6FF"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/themeBlueGold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_blue_gold"
+            android:textColor="#F4F6FF"
+            android:textSize="18sp" />
+    </RadioGroup>
 
     <Button
         android:id="@+id/backButton"

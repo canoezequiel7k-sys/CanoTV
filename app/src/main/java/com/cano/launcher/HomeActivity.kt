@@ -16,7 +16,6 @@ import androidx.core.view.doOnNextLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ActivityHomeBinding
-import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -26,13 +25,13 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var adapter: AppAdapter
+    private lateinit var palette: ThemePalette
     private val repository by lazy { AppRepository(packageManager) }
     private val favorites by lazy { FavoritesStore(this) }
     private val settings by lazy { SettingsStore(this) }
     private val worker: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val loadGeneration = AtomicInteger()
-    private val backgroundGeneration = AtomicInteger()
     private var allApps = emptyList<AppEntry>()
     private var section = Section.HOME
     private var receiverRegistered = false
@@ -49,9 +48,11 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        palette = ThemePalette.forId(settings.themeId, resources.displayMetrics.density)
         adapter = AppAdapter(
             onAppSelected = ::launchApp,
-            onFavoriteToggle = ::toggleFavorite
+            onFavoriteToggle = ::toggleFavorite,
+            palette = palette
         )
         binding.appsRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         binding.appsRecyclerView.adapter = adapter
@@ -103,7 +104,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         section = if (settings.favoritesFirst) Section.HOME else Section.ALL
-        loadBackground()
+        applyPalette()
         loadApps()
     }
 
@@ -139,35 +140,33 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadBackground() {
-        val generation = backgroundGeneration.incrementAndGet()
-        val uri = settings.backgroundUri
-        if (uri == null) {
-            binding.homeBackground.setImageResource(R.drawable.home_bg)
-            return
+    private fun applyPalette() {
+        palette = ThemePalette.forId(settings.themeId, resources.displayMetrics.density)
+        binding.homeBackground.setImageResource(palette.backgroundRes)
+        binding.homeBackgroundOverlay.setBackgroundColor(palette.overlay)
+        binding.homeRoot.setBackgroundColor(palette.canvas)
+        binding.sidebar.setBackgroundColor(palette.sidebar)
+        (binding.sidebar.getChildAt(0) as? android.widget.TextView)?.setTextColor(palette.text)
+        listOf(
+            binding.navHome,
+            binding.navFavorites,
+            binding.navAllApps,
+            binding.navStore,
+            binding.navSettings,
+            binding.navAbout
+        ).forEach { navigationItem ->
+            navigationItem.background = palette.navigationBackground()
         }
-        val targetWidth = resources.displayMetrics.widthPixels
-        val targetHeight = resources.displayMetrics.heightPixels
-        worker.execute {
-            val bitmap = try {
-                BackgroundImage.decode(this, uri, targetWidth, targetHeight)
-            } catch (_: IOException) {
-                null
-            } catch (_: SecurityException) {
-                null
-            }
-            mainHandler.post {
-                if (!isFinishing && !isDestroyed && generation == backgroundGeneration.get()) {
-                    if (bitmap != null) {
-                        binding.homeBackground.setImageBitmap(bitmap)
-                    } else {
-                        settings.backgroundUri = null
-                        binding.homeBackground.setImageResource(R.drawable.home_bg)
-                        Toast.makeText(this, R.string.background_load_failed, Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }
+        styleNavigation()
+        binding.welcomeTitle.setTextColor(palette.text)
+        binding.clock.setTextColor(palette.text)
+        binding.welcomeSubtitle.setTextColor(palette.muted)
+        binding.exploreApps.setBackgroundColor(palette.surface)
+        binding.exploreApps.setTextColor(palette.text)
+        binding.appsTitle.setTextColor(palette.text)
+        binding.favoriteHint.setTextColor(palette.muted)
+        binding.emptyAppsMessage.setTextColor(palette.muted)
+        adapter.setPalette(palette)
     }
 
     private fun renderApps() {
@@ -199,9 +198,27 @@ class HomeActivity : AppCompatActivity() {
         binding.navHome.isSelected = section == Section.HOME
         binding.navFavorites.isSelected = section == Section.FAVORITES
         binding.navAllApps.isSelected = section == Section.ALL
+        styleNavigation()
         val position = adapter.getSelectedPosition()
         if (position != RecyclerView.NO_POSITION) {
             focusFirstApp(position)
+        }
+    }
+
+    private fun styleNavigation() {
+        listOf(
+            binding.navHome,
+            binding.navFavorites,
+            binding.navAllApps,
+            binding.navStore,
+            binding.navSettings,
+            binding.navAbout
+        ).forEach { navigationItem ->
+            val selected = navigationItem.isSelected
+            (navigationItem.getChildAt(1) as? android.widget.TextView)
+                ?.setTextColor(if (selected) palette.text else palette.muted)
+            (navigationItem.getChildAt(0) as? android.widget.ImageView)
+                ?.setColorFilter(if (selected) palette.text else palette.muted)
         }
     }
 

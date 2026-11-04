@@ -10,7 +10,8 @@ import com.cano.launcher.databinding.ItemAppBinding
 
 class AppAdapter(
     private val onAppSelected: (AppEntry) -> Unit,
-    private val onFavoriteToggle: (AppEntry) -> Boolean
+    private val onFavoriteToggle: (AppEntry) -> Boolean,
+    private var palette: ThemePalette
 ) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
     private val items = mutableListOf<AppEntry>()
@@ -31,6 +32,11 @@ class AppAdapter(
     }
 
     fun getSelectedPosition(): Int = selectedPosition
+
+    fun setPalette(palette: ThemePalette) {
+        this.palette = palette
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -61,6 +67,8 @@ class AppAdapter(
             val favoriteKey = "${app.packageName}/${app.activityName}"
             binding.appLabel.text = if (favoriteKey in favorites) "★ ${app.label}" else app.label
             binding.root.isActivated = isSelected
+            binding.root.background = palette.appCardBackground()
+            binding.appLabel.setTextColor(palette.text)
             binding.root.setOnClickListener { onAppSelected(app) }
             binding.root.setOnLongClickListener {
                 onFavoriteToggle(app)
