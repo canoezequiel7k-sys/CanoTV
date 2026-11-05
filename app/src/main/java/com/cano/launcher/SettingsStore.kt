@@ -2,6 +2,7 @@ package com.cano.launcher
 
 import android.content.Context
 
+/** Lee y persiste las preferencias visuales y de idioma de CanoTV. */
 class SettingsStore(context: Context) {
     private val preferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 

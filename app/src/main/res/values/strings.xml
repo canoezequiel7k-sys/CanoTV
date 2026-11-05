@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">CanoTV</string>
     <string name="brand_name">CanoTV</string>
-    <string name="launcher_status">Launcher base</string>
     <string name="no_launchable_apps">No hay aplicaciones instaladas para mostrar.</string>
     <string name="app_launch_failed">No se pudo abrir la aplicación. La lista se actualizará.</string>
     <string name="install_apps">Instalar apps</string>

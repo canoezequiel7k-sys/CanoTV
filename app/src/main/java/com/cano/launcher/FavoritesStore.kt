@@ -2,6 +2,7 @@ package com.cano.launcher
 
 import android.content.Context
 
+/** Guarda localmente los favoritos identificados por paquete y actividad. */
 class FavoritesStore(context: Context) {
     private val preferences = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
 

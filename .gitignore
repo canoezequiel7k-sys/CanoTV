@@ -1,0 +1,17 @@
+# Configuración local del SDK y del IDE
+local.properties
+.idea/
+*.iml
+
+# Cachés y resultados de compilación
+.gradle/
+**/build/
+
+# Claves y configuración de firma local
+*.jks
+*.keystore
+keystore.properties
+
+# Archivos locales del sistema operativo
+.DS_Store
+Thumbs.db

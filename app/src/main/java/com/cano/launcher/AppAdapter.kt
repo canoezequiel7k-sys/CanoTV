@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ItemAppBinding
 
+/** Presenta las tarjetas de aplicaciones y mantiene selección, favoritos y foco D-pad. */
 class AppAdapter(
     private val onAppSelected: (AppEntry) -> Unit,
     private val onFavoriteToggle: (AppEntry) -> Boolean,

@@ -3,6 +3,7 @@ package com.cano.launcher
 import android.content.Intent
 import android.content.pm.PackageManager
 
+/** Consulta aplicaciones visibles para launcher/TV y elimina componentes duplicados. */
 class AppRepository(private val packageManager: PackageManager) {
 
     fun getLaunchableApps(excludedPackage: String): List<AppEntry> {

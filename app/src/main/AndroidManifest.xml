@@ -4,9 +4,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_canotv"
-        android:label="CanoTV"
+        android:label="@string/app_name"
         android:roundIcon="@drawable/ic_canotv"
         android:supportsRtl="true"
         android:theme="@style/Theme.CanoTV">

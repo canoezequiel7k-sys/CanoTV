@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cano.launcher.databinding.ActivityAboutBinding
 import java.util.Locale
 
+/** Muestra información técnica que Android reporta sobre el dispositivo actual. */
 class AboutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAboutBinding
     private lateinit var palette: ThemePalette

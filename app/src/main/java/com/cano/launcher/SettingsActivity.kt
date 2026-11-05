@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 import com.cano.launcher.databinding.ActivitySettingsBinding
 
+/** Pantalla de preferencias de CanoTV y selector de temas. */
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private val settings by lazy { SettingsStore(this) }

@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
+/** Pantalla principal: navega secciones, enumera apps y gestiona foco y apertura. */
 class HomeActivity : AppCompatActivity() {
     private enum class Section { HOME, FAVORITES, ALL }
 

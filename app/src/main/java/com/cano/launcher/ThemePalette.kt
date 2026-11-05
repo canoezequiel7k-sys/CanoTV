@@ -5,6 +5,7 @@ import android.graphics.drawable.StateListDrawable
 import android.util.StateSet
 import androidx.annotation.DrawableRes
 
+/** Define fondos, colores y estados de foco de cada tema. */
 data class ThemePalette(
     val id: String,
     @DrawableRes val backgroundRes: Int,

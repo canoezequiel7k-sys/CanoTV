@@ -5,6 +5,7 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import java.util.Locale
 
+/** Aplica el idioma guardado a los recursos de cada pantalla. */
 object LocaleContext {
     fun wrap(context: Context): Context {
         val language = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
