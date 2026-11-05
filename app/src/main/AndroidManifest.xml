@@ -5,9 +5,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@android:drawable/sym_def_app_icon"
+        android:icon="@drawable/ic_canotv"
         android:label="CanoTV"
-        android:roundIcon="@android:drawable/sym_def_app_icon"
+        android:roundIcon="@drawable/ic_canotv"
         android:supportsRtl="true"
         android:theme="@style/Theme.CanoTV">
         <activity

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ActivityNotFoundException
 import android.graphics.drawable.TransitionDrawable
+import android.content.res.ColorStateList
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -233,7 +234,11 @@ class HomeActivity : AppCompatActivity() {
         binding.wifiIcon.setColorFilter(palette.muted)
         binding.wifiDivider.setBackgroundColor(palette.muted)
         binding.clockDivider.setBackgroundColor(palette.muted)
-        binding.headerSettings.setColorFilter(palette.muted)
+        binding.headerSettings.background = palette.navigationBackground()
+        binding.headerSettings.imageTintList = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()),
+            intArrayOf(palette.accent, palette.muted)
+        )
         binding.welcomeSubtitle.setTextColor(palette.muted)
         binding.exploreApps.background = palette.appCardBackground()
         binding.exploreApps.setTextColor(palette.text)
