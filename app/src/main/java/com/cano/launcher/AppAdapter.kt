@@ -10,6 +10,7 @@ import com.cano.launcher.databinding.ItemAppBinding
 class AppAdapter(
     private val onAppSelected: (AppEntry) -> Unit,
     private val onFavoriteToggle: (AppEntry) -> Boolean,
+    private val onAppFocused: (AppEntry) -> Unit,
     private val onGridKey: (KeyEvent) -> Boolean,
     private var palette: ThemePalette
 ) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
@@ -75,15 +76,21 @@ class AppAdapter(
             val density = binding.root.resources.displayMetrics.density
             binding.root.layoutParams = binding.root.layoutParams.apply {
                 width = if (horizontal) {
-                    (120 * density).toInt()
+                    (148 * density).toInt()
                 } else {
                     ViewGroup.LayoutParams.MATCH_PARENT
                 }
-                height = ((if (horizontal) 112 else 148) * density).toInt()
+                height = ((if (horizontal) 96 else 148) * density).toInt()
             }
+            binding.root.setPadding(
+                (if (horizontal) 8 else 12).dp(density),
+                (if (horizontal) 6 else 12).dp(density),
+                (if (horizontal) 8 else 12).dp(density),
+                (if (horizontal) 6 else 12).dp(density)
+            )
             binding.appIcon.layoutParams = binding.appIcon.layoutParams.apply {
-                width = ((if (horizontal) 64 else 80) * density).toInt()
-                height = ((if (horizontal) 64 else 80) * density).toInt()
+                width = ((if (horizontal) 100 else 80) * density).toInt()
+                height = ((if (horizontal) 52 else 80) * density).toInt()
             }
             binding.appLabel.layoutParams = (binding.appLabel.layoutParams as ViewGroup.MarginLayoutParams)
                 .apply {
@@ -112,12 +119,17 @@ class AppAdapter(
             binding.root.setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     val position = bindingAdapterPosition
-                    if (position != RecyclerView.NO_POSITION) selectedPosition = position
+                    if (position != RecyclerView.NO_POSITION) {
+                        selectedPosition = position
+                        onAppFocused(app)
+                    }
                 } else {
                     binding.root.isActivated = false
                 }
                 if (hasFocus) binding.root.isActivated = true
             }
         }
+
+        private fun Int.dp(density: Float): Int = (this * density).toInt()
     }
 }

@@ -231,13 +231,65 @@
                 android:textSize="42sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/clock"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="21:47"
-                android:textColor="#F4F6FF"
-                android:textSize="24sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/wifiIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@string/wifi_disconnected"
+                    android:src="@drawable/ic_wifi_off" />
+
+                <TextView
+                    android:id="@+id/wifiStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/wifi_disconnected"
+                    android:textColor="#DCE8F7"
+                    android:textSize="16sp" />
+
+                <View
+                    android:id="@+id/wifiDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="#DCE8F7" />
+
+                <TextClock
+                    android:id="@+id/clock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:text="21:47"
+                    android:textColor="#F4F6FF"
+                    android:textSize="24sp" />
+
+                <View
+                    android:id="@+id/clockDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="#DCE8F7" />
+
+                <ImageView
+                    android:id="@+id/headerSettings"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/settings_title"
+                    android:focusable="true"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_settings"
+                    android:tint="#F4F6FF" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -254,22 +306,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="#1B2434"
             android:clickable="true"
             android:focusable="true"
-            android:paddingStart="28dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="28dp"
-            android:paddingBottom="14dp"
-            android:text="Explorar apps"
+            android:paddingStart="22dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="10dp"
+            android:text="@string/explore_apps"
             android:textColor="#F4F6FF"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/appsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="34dp"
+            android:layout_marginTop="22dp"
             android:text="@string/apps_title"
             android:textColor="#F4F6FF"
             android:textSize="30sp"
@@ -296,6 +347,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
+                android:descendantFocusability="afterDescendants"
                 android:focusable="true"
                 android:padding="6dp" />
 
@@ -310,6 +362,62 @@
                 android:src="@drawable/ic_arrow_down"
                 android:visibility="gone" />
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/recommendationTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/recommendation_title"
+            android:textColor="#F4F6FF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/recommendationCard"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/recommendationAppIcon"
+                android:layout_width="68dp"
+                android:layout_height="54dp"
+                android:contentDescription="@null"
+                android:scaleType="centerInside" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/recommendationAppName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#F4F6FF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/recommendationDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="@string/recommendation_description"
+                    android:textColor="#DCE8F7"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/emptyAppsMessage"

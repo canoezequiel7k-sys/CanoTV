@@ -6,6 +6,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ActivityNotFoundException
 import android.graphics.drawable.TransitionDrawable
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -42,7 +45,17 @@ class HomeActivity : AppCompatActivity() {
     private var section = Section.HOME
     private var appliedThemeId: String? = null
     private var receiverRegistered = false
+    private var networkCallbackRegistered = false
     private val refreshApps = Runnable { loadApps() }
+    private val connectivityManager by lazy {
+        getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) = refreshWifiStatus()
+        override fun onLost(network: Network) = refreshWifiStatus()
+        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) =
+            refreshWifiStatus()
+    }
     private val packageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             mainHandler.removeCallbacks(refreshApps)
@@ -59,11 +72,13 @@ class HomeActivity : AppCompatActivity() {
         adapter = AppAdapter(
             onAppSelected = ::launchApp,
             onFavoriteToggle = ::toggleFavorite,
+            onAppFocused = ::showRecommendation,
             onGridKey = ::handleGridKey,
             palette = palette
         )
         binding.appsRecyclerView.layoutManager = GridLayoutManager(this, APP_GRID_COLUMNS)
         binding.appsRecyclerView.adapter = adapter
+        binding.appsRecyclerView.itemAnimator = null
         binding.appsRecyclerView.setHasFixedSize(true)
         binding.appsRecyclerView.setOnKeyListener { _, _, event -> handleGridKey(event) }
         binding.appsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -76,11 +91,12 @@ class HomeActivity : AppCompatActivity() {
         binding.navFavorites.setOnClickListener { showSection(Section.FAVORITES) }
         binding.navAllApps.setOnClickListener { showSection(Section.ALL) }
         binding.exploreApps.setOnClickListener { showSection(Section.ALL) }
-        binding.navStore.setOnClickListener { openAppStore() }
-        binding.navSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-            overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
+        binding.recommendationCard.setOnClickListener {
+            allVisibleApps.getOrNull(adapter.getSelectedPosition())?.let(::launchApp)
         }
+        binding.headerSettings.setOnClickListener { openSettings() }
+        binding.navStore.setOnClickListener { openAppStore() }
+        binding.navSettings.setOnClickListener { openSettings() }
         binding.navAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
@@ -115,12 +131,16 @@ class HomeActivity : AppCompatActivity() {
         }
         registerReceiver(packageReceiver, filter)
         receiverRegistered = true
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        networkCallbackRegistered = true
+        refreshWifiStatus()
     }
 
     override fun onResume() {
         super.onResume()
         section = if (settings.favoritesFirst) Section.HOME else Section.ALL
         applyPalette()
+        refreshWifiStatus()
         loadApps()
     }
 
@@ -128,6 +148,10 @@ class HomeActivity : AppCompatActivity() {
         if (receiverRegistered) {
             unregisterReceiver(packageReceiver)
             receiverRegistered = false
+        }
+        if (networkCallbackRegistered) {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+            networkCallbackRegistered = false
         }
         mainHandler.removeCallbacks(refreshApps)
         super.onStop()
@@ -194,10 +218,19 @@ class HomeActivity : AppCompatActivity() {
         styleNavigation()
         binding.welcomeTitle.setTextColor(palette.text)
         binding.clock.setTextColor(palette.text)
+        binding.wifiStatus.setTextColor(palette.muted)
+        binding.wifiIcon.setColorFilter(palette.muted)
+        binding.wifiDivider.setBackgroundColor(palette.muted)
+        binding.clockDivider.setBackgroundColor(palette.muted)
+        binding.headerSettings.setColorFilter(palette.muted)
         binding.welcomeSubtitle.setTextColor(palette.muted)
-        binding.exploreApps.setBackgroundColor(palette.surface)
+        binding.exploreApps.background = palette.appCardBackground()
         binding.exploreApps.setTextColor(palette.text)
         binding.appsTitle.setTextColor(palette.text)
+        binding.recommendationTitle.setTextColor(palette.text)
+        binding.recommendationAppName.setTextColor(palette.text)
+        binding.recommendationDescription.setTextColor(palette.muted)
+        binding.recommendationCard.background = palette.appCardBackground()
         binding.favoriteHint.setTextColor(palette.muted)
         binding.emptyAppsMessage.setTextColor(palette.muted)
         binding.appsRecyclerView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -225,15 +258,18 @@ class HomeActivity : AppCompatActivity() {
             binding.appsRecyclerView.layoutManager = GridLayoutManager(this, APP_GRID_COLUMNS)
         }
         val frameParams = binding.appsFrame.layoutParams as android.widget.LinearLayout.LayoutParams
-        frameParams.height = if (isHome) 0 else dp(380)
-        frameParams.weight = if (isHome) 1f else 0f
+        frameParams.height = if (isHome) dp(130) else dp(380)
+        frameParams.weight = 0f
         binding.appsFrame.layoutParams = frameParams
         binding.appsRecyclerView.layoutParams = binding.appsRecyclerView.layoutParams.apply {
             height = if (isHome) ViewGroup.LayoutParams.MATCH_PARENT else dp(340)
         }
-        binding.welcomeTitle.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.welcomeTitle.visibility = if (isHome) View.VISIBLE else View.INVISIBLE
         binding.welcomeSubtitle.visibility = if (isHome) View.VISIBLE else View.GONE
         binding.exploreApps.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.recommendationTitle.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.recommendationCard.visibility =
+            if (isHome && allApps.isNotEmpty()) View.VISIBLE else View.GONE
         binding.favoriteHint.visibility = if (isHome) View.GONE else View.VISIBLE
 
         val favoriteKeys = favorites.getFavorites()
@@ -253,6 +289,7 @@ class HomeActivity : AppCompatActivity() {
             adapter.selectPosition(0)
         }
         allVisibleApps = visibleApps
+        updateMoreAppsHint()
         binding.emptyAppsMessage.visibility =
             if (visibleApps.isEmpty()) View.VISIBLE else View.GONE
         binding.emptyAppsMessage.setText(
@@ -300,10 +337,9 @@ class HomeActivity : AppCompatActivity() {
         if (position == RecyclerView.NO_POSITION) return false
         adapter.selectPosition(position)
         binding.appsRecyclerView.scrollToPosition(position)
-        binding.appsRecyclerView.requestFocus()
         binding.appsRecyclerView.post {
             val card = binding.appsRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
-            if (card?.requestFocus() != true && retriesRemaining > 0) {
+            if (card?.requestFocusFromTouch() != true && retriesRemaining > 0) {
                 binding.appsRecyclerView.postDelayed(
                     { focusFirstApp(position, retriesRemaining - 1) },
                     50
@@ -311,6 +347,52 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    private fun showRecommendation(app: AppEntry) {
+        if (section != Section.HOME) return
+        binding.recommendationAppIcon.setImageDrawable(app.banner ?: app.icon)
+        binding.recommendationAppName.text = app.label
+        binding.recommendationDescription.setText(
+            if (app.packageName in RECOMMENDATION_APP_PACKAGES) {
+                R.string.recommendation_description
+            } else {
+                R.string.recommendation_generic_description
+            }
+        )
+        binding.recommendationCard.contentDescription =
+            getString(
+                if (app.packageName in RECOMMENDATION_APP_PACKAGES) {
+                    R.string.recommendation_open
+                } else {
+                    R.string.recommendation_continue
+                },
+                app.label
+            )
+    }
+
+    private fun openSettings() {
+        startActivity(Intent(this, SettingsActivity::class.java))
+        overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
+    }
+
+    private fun refreshWifiStatus() {
+        val connected = connectivityManager.activeNetworkInfo?.let {
+            it.type == ConnectivityManager.TYPE_WIFI && it.isConnected
+        } == true
+        runOnUiThread {
+            binding.wifiStatus.setText(
+                if (connected) R.string.wifi_connected else R.string.wifi_disconnected
+            )
+            binding.wifiStatus.setTextColor(if (connected) palette.accent else palette.muted)
+            binding.wifiIcon.setImageResource(
+                if (connected) R.drawable.ic_wifi else R.drawable.ic_wifi_off
+            )
+            binding.wifiIcon.setColorFilter(if (connected) palette.accent else palette.muted)
+            binding.wifiIcon.contentDescription = getString(
+                if (connected) R.string.wifi_connected else R.string.wifi_disconnected
+            )
+        }
     }
 
     private fun handleGridKey(event: KeyEvent): Boolean {
@@ -382,10 +464,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateMoreAppsHint() {
+        val recyclerView = binding.appsRecyclerView
+        val atTop = !recyclerView.canScrollVertically(-1)
         binding.moreAppsHint.visibility = if (
             section != Section.HOME &&
             allVisibleApps.size > APP_GRID_COLUMNS * 2 &&
-            binding.appsRecyclerView.canScrollVertically(1)
+            (atTop || recyclerView.canScrollVertically(1))
         ) View.VISIBLE else View.GONE
     }
 
@@ -455,5 +539,14 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val APP_GRID_COLUMNS = 3
+        private val RECOMMENDATION_APP_PACKAGES = setOf(
+            "com.netflix.mediaclient",
+            "com.google.android.youtube",
+            "com.google.android.youtube.tv",
+            "com.disney.disneyplus",
+            "com.amazon.avod.thirdpartyclient",
+            "com.hbo.hbonow",
+            "com.spotify.music"
+        )
     }
 }

@@ -43,4 +43,12 @@
     <string name="theme_blue_gold">Azul noche — azul y dorado</string>
     <string name="theme_red_gray">Rojo — blanco y gris</string>
     <string name="theme_dark_gray">Oscuro — gris grafito</string>
+    <string name="explore_apps">Explorar todas las apps</string>
+    <string name="recommendation_title">Recomendado para vos</string>
+    <string name="recommendation_description">Abrí la app para ver sus recomendaciones.</string>
+    <string name="recommendation_generic_description">Abrí esta app para continuar.</string>
+    <string name="recommendation_open">Abrir %1$s para ver recomendaciones</string>
+    <string name="recommendation_continue">Abrir %1$s</string>
+    <string name="wifi_connected">Wi‑Fi conectado</string>
+    <string name="wifi_disconnected">Sin Wi‑Fi</string>
 </resources>
