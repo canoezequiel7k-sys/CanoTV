@@ -35,16 +35,34 @@ data class ThemePalette(
     fun appCardBackground(): StateListDrawable = StateListDrawable().apply {
         addState(
             intArrayOf(android.R.attr.state_focused),
-            shape(surfaceSelected, accent, 3, 14)
+            shape(withAlpha(surfaceSelected, 0xF2), accent, 3, 14)
         )
         addState(
             intArrayOf(android.R.attr.state_activated),
-            shape(surface, accent, 2, 12)
+            shape(withAlpha(surface, 0xE8), accent, 2, 12)
         )
-        addState(StateSet.WILD_CARD, shape(surface, border, 1, 12))
+        addState(StateSet.WILD_CARD, shape(withAlpha(surface, 0xD9), border, 1, 12))
     }
 
+    fun settingsOptionBackground(showChecked: Boolean = false): StateListDrawable =
+        StateListDrawable().apply {
+            addState(
+                intArrayOf(android.R.attr.state_focused),
+                shape(withAlpha(surfaceSelected, 0xF2), accent, 2, 8)
+            )
+            if (showChecked) {
+                addState(
+                    intArrayOf(android.R.attr.state_checked),
+                    shape(withAlpha(surface, 0xE8), accent, 1, 8)
+                )
+            }
+            addState(StateSet.WILD_CARD, shape(android.graphics.Color.TRANSPARENT, 0, 0, 8))
+        }
+
     fun infoCardBackground() = shape(surface, border, 1, 10)
+
+    private fun withAlpha(color: Int, alpha: Int): Int =
+        (color and 0x00FFFFFF) or (alpha shl 24)
 
     private fun shape(color: Int, strokeColor: Int, strokeWidth: Int, radius: Int) =
         GradientDrawable().apply {
@@ -61,12 +79,14 @@ data class ThemePalette(
         const val SAGE = "sage"
         const val BLUE_GOLD = "blue_gold"
         const val RED_GRAY = "red_gray"
+        const val DARK_GRAY = "dark_gray"
 
         fun forId(id: String, density: Float = 1f): ThemePalette {
             val palette = when (id) {
                 SAGE -> sage
                 BLUE_GOLD -> blueGold
                 RED_GRAY -> redGray
+                DARK_GRAY -> darkGray
                 else -> purple
             }
             return palette.copy(density = density)
@@ -95,6 +115,12 @@ data class ThemePalette(
             0xFF2C2C30.toInt(), 0xFF484044.toInt(), 0xFF68666A.toInt(),
             0xFFE54B54.toInt(), 0xFFF7F5F5.toInt(), 0xFFD0CDCF.toInt(), 0x710D080A,
             0xFF353438.toInt()
+        )
+        private val darkGray = ThemePalette(
+            DARK_GRAY, R.drawable.theme_darkgray, 0xFF17191C.toInt(), 0xFF1B1D20.toInt(),
+            0xFF292C30.toInt(), 0xFF454A50.toInt(), 0xFF71767C.toInt(),
+            0xFFD5D9DD.toInt(), 0xFFF4F5F6.toInt(), 0xFFD2D5D8.toInt(), 0x5005090D,
+            0xFF303338.toInt()
         )
     }
 }

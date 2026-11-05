@@ -24,6 +24,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:minHeight="52dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:text="@string/favorites_first_setting"
         android:textColor="#F4F6FF"
         android:textSize="22sp"
@@ -57,7 +61,10 @@
         <RadioButton
             android:id="@+id/themePurple"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:focusable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="@string/theme_purple"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
@@ -65,7 +72,10 @@
         <RadioButton
             android:id="@+id/themeSage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:focusable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="@string/theme_sage"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
@@ -73,7 +83,10 @@
         <RadioButton
             android:id="@+id/themeBlueGold"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:focusable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="@string/theme_blue_gold"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
@@ -81,8 +94,22 @@
         <RadioButton
             android:id="@+id/themeRedGray"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:focusable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="@string/theme_red_gray"
+            android:textColor="#F4F6FF"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/themeDarkGray"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:focusable="true"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/theme_dark_gray"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
     </RadioGroup>

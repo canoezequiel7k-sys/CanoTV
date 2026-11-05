@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ActivityNotFoundException
+import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -39,6 +40,7 @@ class HomeActivity : AppCompatActivity() {
     private var allVisibleApps = emptyList<AppEntry>()
     private var gridKeyDownTime = 0L
     private var section = Section.HOME
+    private var appliedThemeId: String? = null
     private var receiverRegistered = false
     private val refreshApps = Runnable { loadApps() }
     private val packageReceiver = object : BroadcastReceiver() {
@@ -77,6 +79,7 @@ class HomeActivity : AppCompatActivity() {
         binding.navStore.setOnClickListener { openAppStore() }
         binding.navSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
+            overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
         }
         binding.navAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
@@ -154,8 +157,26 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun applyPalette() {
-        palette = ThemePalette.forId(settings.themeId, resources.displayMetrics.density)
-        binding.homeBackground.setImageResource(palette.backgroundRes)
+        val themeId = settings.themeId
+        val themeChanged = appliedThemeId != null && appliedThemeId != themeId
+        val previousBackground = binding.homeBackground.drawable
+        palette = ThemePalette.forId(themeId, resources.displayMetrics.density)
+        val nextBackground = resources.getDrawable(palette.backgroundRes)
+        if (themeChanged && previousBackground != null) {
+            val transition = TransitionDrawable(arrayOf(previousBackground, nextBackground)).apply {
+                isCrossFadeEnabled = true
+            }
+            binding.homeBackground.setImageDrawable(transition)
+            transition.startTransition(220)
+            binding.homeBackground.postDelayed({
+                if (binding.homeBackground.drawable === transition) {
+                    binding.homeBackground.setImageDrawable(nextBackground)
+                }
+            }, 240)
+        } else {
+            binding.homeBackground.setImageDrawable(nextBackground)
+        }
+        appliedThemeId = themeId
         binding.homeBackgroundOverlay.setBackgroundColor(palette.overlay)
         binding.homeRoot.setBackgroundColor(palette.canvas)
         binding.sidebar.setBackgroundColor(palette.sidebar)

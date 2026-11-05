@@ -25,6 +25,7 @@ class SettingsActivity : AppCompatActivity() {
                 ThemePalette.SAGE -> binding.themeSage.id
                 ThemePalette.BLUE_GOLD -> binding.themeBlueGold.id
                 ThemePalette.RED_GRAY -> binding.themeRedGray.id
+                ThemePalette.DARK_GRAY -> binding.themeDarkGray.id
                 else -> binding.themePurple.id
             }
         )
@@ -34,13 +35,23 @@ class SettingsActivity : AppCompatActivity() {
                 binding.themeSage.id -> ThemePalette.SAGE
                 binding.themeBlueGold.id -> ThemePalette.BLUE_GOLD
                 binding.themeRedGray.id -> ThemePalette.RED_GRAY
+                binding.themeDarkGray.id -> ThemePalette.DARK_GRAY
                 else -> ThemePalette.PURPLE
             }
             settings.themeId = themeId
             applyPalette()
         }
-        binding.backButton.setOnClickListener { finish() }
-        binding.favoritesFirstSwitch.requestFocus()
+        binding.backButton.setOnClickListener { finishWithTransition() }
+        binding.favoritesFirstSwitch.post { binding.favoritesFirstSwitch.requestFocusFromTouch() }
+    }
+
+    override fun onBackPressed() {
+        finishWithTransition()
+    }
+
+    private fun finishWithTransition() {
+        finish()
+        overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
     }
 
     private fun applyPalette() {
@@ -50,12 +61,20 @@ class SettingsActivity : AppCompatActivity() {
         binding.favoritesFirstSwitch.setTextColor(palette.text)
         binding.favoritesFirstSummary.setTextColor(palette.muted)
         binding.themeTitle.setTextColor(palette.text)
-        listOf(binding.themePurple, binding.themeSage, binding.themeBlueGold, binding.themeRedGray).forEach {
+        binding.favoritesFirstSwitch.background = palette.settingsOptionBackground()
+        listOf(
+            binding.themePurple,
+            binding.themeSage,
+            binding.themeBlueGold,
+            binding.themeRedGray,
+            binding.themeDarkGray
+        ).forEach {
             it.setTextColor(palette.text)
             it.buttonTintList = ColorStateList.valueOf(palette.accent)
+            it.background = palette.settingsOptionBackground(showChecked = true)
         }
         binding.favoritesFirstSwitch.thumbTintList = ColorStateList.valueOf(palette.accent)
-        binding.backButton.backgroundTintList = ColorStateList.valueOf(palette.surfaceSelected)
+        binding.backButton.background = palette.settingsOptionBackground()
         binding.backButton.setTextColor(palette.text)
     }
 }
