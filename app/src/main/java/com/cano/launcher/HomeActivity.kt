@@ -9,13 +9,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.doOnNextLayout
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ActivityHomeBinding
 import java.util.concurrent.ExecutorService
@@ -63,10 +64,16 @@ class HomeActivity : AppCompatActivity() {
         binding.appsRecyclerView.adapter = adapter
         binding.appsRecyclerView.setHasFixedSize(true)
         binding.appsRecyclerView.setOnKeyListener { _, _, event -> handleGridKey(event) }
+        binding.appsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                updateMoreAppsHint()
+            }
+        })
 
         binding.navHome.setOnClickListener { showSection(Section.HOME) }
         binding.navFavorites.setOnClickListener { showSection(Section.FAVORITES) }
         binding.navAllApps.setOnClickListener { showSection(Section.ALL) }
+        binding.exploreApps.setOnClickListener { showSection(Section.ALL) }
         binding.navStore.setOnClickListener { openAppStore() }
         binding.navSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -172,11 +179,42 @@ class HomeActivity : AppCompatActivity() {
         binding.appsTitle.setTextColor(palette.text)
         binding.favoriteHint.setTextColor(palette.muted)
         binding.emptyAppsMessage.setTextColor(palette.muted)
-        binding.appsRecyclerView.setBackgroundColor(palette.gridBackground)
+        binding.appsRecyclerView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        binding.moreAppsHint.setColorFilter(palette.text)
+        binding.moreAppsHint.background = palette.appCardBackground()
         adapter.setPalette(palette)
     }
 
-    private fun renderApps() {
+    private fun renderApps(resetSelection: Boolean = false) {
+        val isHome = section == Section.HOME
+        adapter.setHorizontalItems(isHome)
+        val currentLayoutManager = binding.appsRecyclerView.layoutManager
+        if (isHome) {
+            if (currentLayoutManager !is LinearLayoutManager ||
+                currentLayoutManager is GridLayoutManager ||
+                currentLayoutManager.orientation != RecyclerView.HORIZONTAL
+            ) {
+                binding.appsRecyclerView.layoutManager = LinearLayoutManager(
+                    this,
+                    RecyclerView.HORIZONTAL,
+                    false
+                )
+            }
+        } else if (currentLayoutManager !is GridLayoutManager) {
+            binding.appsRecyclerView.layoutManager = GridLayoutManager(this, APP_GRID_COLUMNS)
+        }
+        val frameParams = binding.appsFrame.layoutParams as android.widget.LinearLayout.LayoutParams
+        frameParams.height = if (isHome) 0 else dp(380)
+        frameParams.weight = if (isHome) 1f else 0f
+        binding.appsFrame.layoutParams = frameParams
+        binding.appsRecyclerView.layoutParams = binding.appsRecyclerView.layoutParams.apply {
+            height = if (isHome) ViewGroup.LayoutParams.MATCH_PARENT else dp(340)
+        }
+        binding.welcomeTitle.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.welcomeSubtitle.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.exploreApps.visibility = if (isHome) View.VISIBLE else View.GONE
+        binding.favoriteHint.visibility = if (isHome) View.GONE else View.VISIBLE
+
         val favoriteKeys = favorites.getFavorites()
         val visibleApps = when (section) {
             Section.HOME -> if (settings.favoritesFirst) {
@@ -190,6 +228,9 @@ class HomeActivity : AppCompatActivity() {
             Section.ALL -> allApps
         }
         adapter.submitItems(visibleApps, favoriteKeys)
+        if (resetSelection && visibleApps.isNotEmpty()) {
+            adapter.selectPosition(0)
+        }
         allVisibleApps = visibleApps
         binding.emptyAppsMessage.visibility =
             if (visibleApps.isEmpty()) View.VISIBLE else View.GONE
@@ -211,6 +252,7 @@ class HomeActivity : AppCompatActivity() {
         if (position != RecyclerView.NO_POSITION) {
             focusFirstApp(position)
         }
+        binding.appsRecyclerView.post { updateMoreAppsHint() }
     }
 
     private fun styleNavigation() {
@@ -240,17 +282,11 @@ class HomeActivity : AppCompatActivity() {
         binding.appsRecyclerView.requestFocus()
         binding.appsRecyclerView.post {
             val card = binding.appsRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
-            if (card != null) {
-                card.requestFocus()
-            } else if (retriesRemaining > 0) {
+            if (card?.requestFocus() != true && retriesRemaining > 0) {
                 binding.appsRecyclerView.postDelayed(
                     { focusFirstApp(position, retriesRemaining - 1) },
                     50
                 )
-            } else {
-                binding.appsRecyclerView.doOnNextLayout {
-                    focusFirstApp(position, retriesRemaining - 1)
-                }
             }
         }
         return true
@@ -267,6 +303,19 @@ class HomeActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 if (event.action != KeyEvent.ACTION_DOWN) return true
                 val current = adapter.getSelectedPosition()
+                if (section == Section.HOME) {
+                    if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP ||
+                        event.keyCode == KeyEvent.KEYCODE_DPAD_DOWN
+                    ) return false
+                    val next = if (event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+                        current - 1
+                    } else {
+                        current + 1
+                    }
+                    if (next !in allVisibleApps.indices) return false
+                    focusFirstApp(next)
+                    return true
+                }
                 val column = current % APP_GRID_COLUMNS
                 val next = when (event.keyCode) {
                     KeyEvent.KEYCODE_DPAD_LEFT -> if (column > 0) current - 1 else null
@@ -308,8 +357,19 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showSection(newSection: Section) {
         section = newSection
-        renderApps()
+        renderApps(resetSelection = true)
     }
+
+    private fun updateMoreAppsHint() {
+        binding.moreAppsHint.visibility = if (
+            section != Section.HOME &&
+            allVisibleApps.size > APP_GRID_COLUMNS * 2 &&
+            binding.appsRecyclerView.canScrollVertically(1)
+        ) View.VISIBLE else View.GONE
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
 
     private fun toggleFavorite(app: AppEntry): Boolean {
         val added = favorites.toggle(app)

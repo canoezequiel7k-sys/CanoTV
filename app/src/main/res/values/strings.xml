@@ -7,6 +7,7 @@
     <string name="apps_title">Tus aplicaciones</string>
     <string name="favorites_title">Favoritos</string>
     <string name="all_apps_title">Todas las apps</string>
+    <string name="more_apps_below">Hay más aplicaciones abajo</string>
     <string name="no_favorites">Todavía no hay favoritos. Mantén OK sobre una app para agregarla.</string>
     <string name="favorite_added">Agregada a Favoritos</string>
     <string name="favorite_removed">Quitada de Favoritos</string>

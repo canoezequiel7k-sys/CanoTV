@@ -17,6 +17,7 @@ class AppAdapter(
     private val items = mutableListOf<AppEntry>()
     private var favorites = emptySet<String>()
     private var selectedPosition: Int = RecyclerView.NO_POSITION
+    private var horizontalItems = false
 
     fun submitItems(newItems: List<AppEntry>, favoriteKeys: Set<String>) {
         val selected = items.getOrNull(selectedPosition)
@@ -48,6 +49,12 @@ class AppAdapter(
         notifyDataSetChanged()
     }
 
+    fun setHorizontalItems(horizontal: Boolean) {
+        if (horizontalItems == horizontal) return
+        horizontalItems = horizontal
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAppBinding.inflate(inflater, parent, false)
@@ -56,7 +63,7 @@ class AppAdapter(
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         val app = items[position]
-        holder.bind(app, position == selectedPosition)
+        holder.bind(app, position == selectedPosition, horizontalItems)
     }
 
     override fun getItemCount(): Int = items.size
@@ -64,7 +71,25 @@ class AppAdapter(
     inner class AppViewHolder(
         private val binding: ItemAppBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(app: AppEntry, isSelected: Boolean) {
+        fun bind(app: AppEntry, isSelected: Boolean, horizontal: Boolean) {
+            val density = binding.root.resources.displayMetrics.density
+            binding.root.layoutParams = binding.root.layoutParams.apply {
+                width = if (horizontal) {
+                    (120 * density).toInt()
+                } else {
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                }
+                height = ((if (horizontal) 112 else 148) * density).toInt()
+            }
+            binding.appIcon.layoutParams = binding.appIcon.layoutParams.apply {
+                width = ((if (horizontal) 64 else 80) * density).toInt()
+                height = ((if (horizontal) 64 else 80) * density).toInt()
+            }
+            binding.appLabel.layoutParams = (binding.appLabel.layoutParams as ViewGroup.MarginLayoutParams)
+                .apply {
+                    topMargin = ((if (horizontal) 4 else 8) * density).toInt()
+                }
+            binding.appLabel.textSize = if (horizontal) 16f else 18f
             binding.appIcon.setImageDrawable(app.banner ?: app.icon)
             binding.appIcon.scaleType = if (app.banner != null) {
                 android.widget.ImageView.ScaleType.CENTER_CROP
