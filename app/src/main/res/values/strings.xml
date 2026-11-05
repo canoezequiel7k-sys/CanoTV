@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CanoTV</string>
+    <string name="brand_name">CanoTV</string>
     <string name="launcher_status">Launcher base</string>
     <string name="no_launchable_apps">No hay aplicaciones instaladas para mostrar.</string>
     <string name="app_launch_failed">No se pudo abrir la aplicación. La lista se actualizará.</string>
@@ -33,6 +34,14 @@
     <string name="gib_format">%1$s GiB</string>
     <string name="unknown_value">No disponible</string>
     <string name="settings_title">Configuración</string>
+    <string name="system_settings">Ajustes del dispositivo</string>
+    <string name="system_settings_unavailable">No se pudieron abrir los ajustes del dispositivo.</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_favorites">Favoritos</string>
+    <string name="nav_all_apps">Todas las apps</string>
+    <string name="nav_about">Acerca de</string>
+    <string name="welcome_title">Bienvenido a CanoTV</string>
+    <string name="welcome_subtitle">Tu launcher multimedia, simple y potente.</string>
     <string name="favorites_first_setting">Mostrar favoritos primero en Inicio</string>
     <string name="favorites_first_summary">Al iniciar, las aplicaciones favoritas aparecen antes que las demás.</string>
     <string name="favorite_hint">Mantén pulsado OK o pulsa Menú sobre una app para agregarla o quitarla de Favoritos.</string>
@@ -43,6 +52,17 @@
     <string name="theme_blue_gold">Azul noche — azul y dorado</string>
     <string name="theme_red_gray">Rojo — blanco y gris</string>
     <string name="theme_dark_gray">Oscuro — gris grafito</string>
+    <string name="language_setting">Idioma: %1$s</string>
+    <string name="language_setting_title">Idioma de CanoTV</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+    <string name="app_font_setting">Fuente de las apps: %1$s</string>
+    <string name="app_font_setting_title">Fuente de los nombres</string>
+    <string name="font_sans">Sans serif</string>
+    <string name="font_rounded">Redondeada</string>
+    <string name="font_serif">Serif</string>
+    <string name="app_size_setting">Tamaño de nombres: %1$d sp</string>
+    <string name="app_size_setting_title">Tamaño de los nombres de las apps</string>
     <string name="explore_apps">Explorar todas las apps</string>
     <string name="recommendation_title">Recomendado para vos</string>
     <string name="recommendation_description">Abrí la app para ver sus recomendaciones.</string>
@@ -51,4 +71,18 @@
     <string name="recommendation_continue">Abrir %1$s</string>
     <string name="wifi_connected">Wi‑Fi conectado</string>
     <string name="wifi_disconnected">Sin Wi‑Fi</string>
+    <string-array name="language_choices">
+        <item>Español</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="app_font_choices">
+        <item>Sans serif</item>
+        <item>Redondeada</item>
+        <item>Serif</item>
+    </string-array>
+    <string-array name="app_size_choices">
+        <item>16 sp</item>
+        <item>18 sp</item>
+        <item>20 sp</item>
+    </string-array>
 </resources>

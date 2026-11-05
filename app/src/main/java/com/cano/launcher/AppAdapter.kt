@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.graphics.Typeface
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ItemAppBinding
 
@@ -19,6 +20,8 @@ class AppAdapter(
     private var favorites = emptySet<String>()
     private var selectedPosition: Int = RecyclerView.NO_POSITION
     private var horizontalItems = false
+    private var appLabelSize = SettingsStore.DEFAULT_APP_LABEL_SIZE.toFloat()
+    private var appFont = SettingsStore.FONT_SANS
 
     fun submitItems(newItems: List<AppEntry>, favoriteKeys: Set<String>) {
         val selected = items.getOrNull(selectedPosition)
@@ -53,6 +56,13 @@ class AppAdapter(
     fun setHorizontalItems(horizontal: Boolean) {
         if (horizontalItems == horizontal) return
         horizontalItems = horizontal
+        notifyDataSetChanged()
+    }
+
+    fun setAppLabelStyle(sizeSp: Int, font: String) {
+        if (appLabelSize == sizeSp.toFloat() && appFont == font) return
+        appLabelSize = sizeSp.toFloat()
+        appFont = font
         notifyDataSetChanged()
     }
 
@@ -96,7 +106,12 @@ class AppAdapter(
                 .apply {
                     topMargin = ((if (horizontal) 4 else 8) * density).toInt()
                 }
-            binding.appLabel.textSize = if (horizontal) 16f else 18f
+            binding.appLabel.textSize = appLabelSize
+            binding.appLabel.typeface = when (appFont) {
+                SettingsStore.FONT_ROUNDED -> Typeface.create("sans-serif-rounded", Typeface.NORMAL)
+                SettingsStore.FONT_SERIF -> Typeface.create("serif", Typeface.NORMAL)
+                else -> Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            }
             binding.appIcon.setImageDrawable(app.banner ?: app.icon)
             binding.appIcon.scaleType = if (app.banner != null) {
                 android.widget.ImageView.ScaleType.CENTER_CROP

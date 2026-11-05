@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name">CanoTV</string>
+    <string name="brand_name">CanoTV</string>
+    <string name="launcher_status">Launcher</string>
+    <string name="no_launchable_apps">No installed apps to show.</string>
+    <string name="app_launch_failed">Could not open the app. The list will be refreshed.</string>
+    <string name="install_apps">Install apps</string>
+    <string name="apps_title">Your apps</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="all_apps_title">All apps</string>
+    <string name="more_apps_below">More apps below</string>
+    <string name="no_favorites">No favorites yet. Hold OK on an app to add it.</string>
+    <string name="favorite_added">Added to Favorites</string>
+    <string name="favorite_removed">Removed from Favorites</string>
+    <string name="store_unavailable_title">No app store available</string>
+    <string name="store_unavailable_message">You can install a compatible store from an official APK on a USB drive using the file manager. Android will show its installer and may ask you to allow unknown sources. CanoTV does not download APKs or bypass this protection.</string>
+    <string name="open_file_manager">Open file manager</string>
+    <string name="about_title">About CanoTV</string>
+    <string name="about_message">Information reported by the device and its firmware.</string>
+    <string name="device_model">Device</string>
+    <string name="android_version">Android</string>
+    <string name="build_device">Device identifier</string>
+    <string name="architecture">Architecture</string>
+    <string name="display">Display</string>
+    <string name="memory">Reported RAM (total / available)</string>
+    <string name="storage">Data storage (total / free)</string>
+    <string name="graphics">Reported OpenGL ES</string>
+    <string name="app_version">CanoTV version</string>
+    <string name="android_version_format">Android %1$s (API %2$d)</string>
+    <string name="display_format">%1$d × %2$d, %3$d dpi</string>
+    <string name="memory_format">%1$s / %2$s</string>
+    <string name="storage_format">%1$s / %2$s</string>
+    <string name="opengl_format">%1$d.%2$d</string>
+    <string name="gib_format">%1$s GiB</string>
+    <string name="unknown_value">Unavailable</string>
+    <string name="settings_title">CanoTV Settings</string>
+    <string name="system_settings">Device settings</string>
+    <string name="system_settings_unavailable">Could not open device settings.</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_all_apps">All apps</string>
+    <string name="nav_about">About</string>
+    <string name="welcome_title">Welcome to CanoTV</string>
+    <string name="welcome_subtitle">Your simple, powerful multimedia launcher.</string>
+    <string name="favorites_first_setting">Show favorites first on Home</string>
+    <string name="favorites_first_summary">Favorites appear before other apps when Home opens.</string>
+    <string name="favorite_hint">Hold OK or press Menu on an app to add or remove it from Favorites.</string>
+    <string name="back">Back</string>
+    <string name="theme_setting">CanoTV theme</string>
+    <string name="theme_purple">Purple — pink and magenta</string>
+    <string name="theme_sage">Sage — green and aqua</string>
+    <string name="theme_blue_gold">Night blue — blue and gold</string>
+    <string name="theme_red_gray">Red — white and gray</string>
+    <string name="theme_dark_gray">Dark — graphite gray</string>
+    <string name="language_setting">Language: %1$s</string>
+    <string name="language_setting_title">CanoTV language</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+    <string name="app_font_setting">App label font: %1$s</string>
+    <string name="app_font_setting_title">App label font</string>
+    <string name="font_sans">Sans serif</string>
+    <string name="font_rounded">Rounded</string>
+    <string name="font_serif">Serif</string>
+    <string name="app_size_setting">App label size: %1$d sp</string>
+    <string name="app_size_setting_title">App label size</string>
+    <string name="explore_apps">Explore all apps</string>
+    <string name="recommendation_title">Recommended for you</string>
+    <string name="recommendation_description">Open the app to see its recommendations.</string>
+    <string name="recommendation_generic_description">Open this app to continue.</string>
+    <string name="recommendation_open">Open %1$s to see recommendations</string>
+    <string name="recommendation_continue">Open %1$s</string>
+    <string name="wifi_connected">Wi‑Fi connected</string>
+    <string name="wifi_disconnected">No Wi‑Fi</string>
+    <string-array name="language_choices">
+        <item>Español</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="app_font_choices">
+        <item>Sans serif</item>
+        <item>Rounded</item>
+        <item>Serif</item>
+    </string-array>
+    <string-array name="app_size_choices">
+        <item>16 sp</item>
+        <item>18 sp</item>
+        <item>20 sp</item>
+    </string-array>
+</resources>

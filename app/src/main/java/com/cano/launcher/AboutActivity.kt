@@ -1,6 +1,7 @@
 package com.cano.launcher
 
 import android.app.ActivityManager
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.StatFs
@@ -16,6 +17,10 @@ import java.util.Locale
 class AboutActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAboutBinding
     private lateinit var palette: ThemePalette
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleContext.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -10,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.provider.Settings
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -44,6 +45,7 @@ class HomeActivity : AppCompatActivity() {
     private var gridKeyDownTime = 0L
     private var section = Section.HOME
     private var appliedThemeId: String? = null
+    private var appliedLanguage: String? = null
     private var receiverRegistered = false
     private var networkCallbackRegistered = false
     private val refreshApps = Runnable { loadApps() }
@@ -67,6 +69,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        appliedLanguage = settings.language
 
         palette = ThemePalette.forId(settings.themeId, resources.displayMetrics.density)
         adapter = AppAdapter(
@@ -94,7 +97,7 @@ class HomeActivity : AppCompatActivity() {
         binding.recommendationCard.setOnClickListener {
             allVisibleApps.getOrNull(adapter.getSelectedPosition())?.let(::launchApp)
         }
-        binding.headerSettings.setOnClickListener { openSettings() }
+        binding.headerSettings.setOnClickListener { openSystemSettings() }
         binding.navStore.setOnClickListener { openAppStore() }
         binding.navSettings.setOnClickListener { openSettings() }
         binding.navAbout.setOnClickListener {
@@ -138,6 +141,10 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (appliedLanguage != settings.language) {
+            recreate()
+            return
+        }
         section = if (settings.favoritesFirst) Section.HOME else Section.ALL
         applyPalette()
         refreshWifiStatus()
@@ -204,7 +211,6 @@ class HomeActivity : AppCompatActivity() {
         binding.homeBackgroundOverlay.setBackgroundColor(palette.overlay)
         binding.homeRoot.setBackgroundColor(palette.canvas)
         binding.sidebar.setBackgroundColor(palette.sidebar)
-        (binding.sidebar.getChildAt(0) as? android.widget.TextView)?.setTextColor(palette.text)
         listOf(
             binding.navHome,
             binding.navFavorites,
@@ -217,6 +223,7 @@ class HomeActivity : AppCompatActivity() {
         }
         styleNavigation()
         binding.welcomeTitle.setTextColor(palette.text)
+        styleLogo()
         binding.clock.setTextColor(palette.text)
         binding.wifiStatus.setTextColor(palette.muted)
         binding.wifiIcon.setColorFilter(palette.muted)
@@ -274,10 +281,15 @@ class HomeActivity : AppCompatActivity() {
 
         val favoriteKeys = favorites.getFavorites()
         val visibleApps = when (section) {
-            Section.HOME -> if (settings.favoritesFirst) {
-                allApps.sortedByDescending { "${it.packageName}/${it.activityName}" in favoriteKeys }
-            } else {
-                allApps
+            Section.HOME -> {
+                val homeApps = allApps.filterNot(::isDeviceSettingsApp)
+                if (settings.favoritesFirst) {
+                    homeApps.sortedByDescending {
+                        "${it.packageName}/${it.activityName}" in favoriteKeys
+                    }
+                } else {
+                    homeApps
+                }
             }
             Section.FAVORITES -> allApps.filter {
                 "${it.packageName}/${it.activityName}" in favoriteKeys
@@ -289,6 +301,7 @@ class HomeActivity : AppCompatActivity() {
             adapter.selectPosition(0)
         }
         allVisibleApps = visibleApps
+        adapter.setAppLabelStyle(settings.appLabelSize, settings.appFont)
         updateMoreAppsHint()
         binding.emptyAppsMessage.visibility =
             if (visibleApps.isEmpty()) View.VISIBLE else View.GONE
@@ -329,6 +342,19 @@ class HomeActivity : AppCompatActivity() {
                 ?.setColorFilter(if (selected) palette.text else palette.muted)
         }
     }
+
+    private fun styleLogo() {
+        binding.logoInitial.setTextColor(palette.accent)
+        binding.logoMiddle.setTextColor(palette.text)
+        binding.logoSuffix.setTextColor(palette.accent)
+    }
+
+    private fun isDeviceSettingsApp(app: AppEntry): Boolean =
+        app.packageName == SYSTEM_SETTINGS_PACKAGE ||
+            app.label.equals("Ajustes", ignoreCase = true) ||
+            app.label.equals("Configuración", ignoreCase = true) ||
+            app.label.equals("Settings", ignoreCase = true) ||
+            app.label.equals("System settings", ignoreCase = true)
 
     private fun focusFirstApp(
         position: Int = adapter.getSelectedPosition(),
@@ -374,6 +400,16 @@ class HomeActivity : AppCompatActivity() {
     private fun openSettings() {
         startActivity(Intent(this, SettingsActivity::class.java))
         overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
+    }
+
+    private fun openSystemSettings() {
+        try {
+            startActivity(Intent(Settings.ACTION_SETTINGS))
+        } catch (exception: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.system_settings_unavailable, Toast.LENGTH_SHORT).show()
+        } catch (exception: SecurityException) {
+            Toast.makeText(this, R.string.system_settings_unavailable, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun refreshWifiStatus() {
@@ -539,6 +575,7 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val APP_GRID_COLUMNS = 3
+        private const val SYSTEM_SETTINGS_PACKAGE = "com.android.settings"
         private val RECOMMENDATION_APP_PACKAGES = setOf(
             "com.netflix.mediaclient",
             "com.google.android.youtube",

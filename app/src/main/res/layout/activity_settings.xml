@@ -1,124 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/settingsRoot"
     android:background="#0B1223"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:padding="48dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/settingsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_title"
-        android:textColor="#F4F6FF"
-        android:textSize="36sp"
-        android:textStyle="bold" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/favoritesFirstSwitch"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:minHeight="52dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:text="@string/favorites_first_setting"
-        android:textColor="#F4F6FF"
-        android:textSize="22sp"
-        app:useMaterialThemeColors="false" />
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="48dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="48dp"
+        android:paddingBottom="32dp">
 
-    <TextView
-        android:id="@+id/favoritesFirstSummary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/favorites_first_summary"
-        android:textColor="#B9C8DC"
-        android:textSize="18sp" />
+        <TextView
+            android:id="@+id/settingsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title"
+            android:textColor="#F4F6FF"
+            android:textSize="36sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/themeTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/theme_setting"
-        android:textColor="#F4F6FF"
-        android:textSize="22sp"
-        android:textStyle="bold" />
-
-    <RadioGroup
-        android:id="@+id/themeRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp">
-
-        <RadioButton
-            android:id="@+id/themePurple"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/favoritesFirstSwitch"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:minHeight="52dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="@string/theme_purple"
+            android:text="@string/favorites_first_setting"
+            android:textColor="#F4F6FF"
+            android:textSize="22sp"
+            app:useMaterialThemeColors="false" />
+
+        <TextView
+            android:id="@+id/favoritesFirstSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/favorites_first_summary"
+            android:textColor="#B9C8DC"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/languageOption"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="14dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
 
-        <RadioButton
-            android:id="@+id/themeSage"
+        <TextView
+            android:id="@+id/appFontOption"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
             android:focusable="true"
+            android:gravity="center_vertical"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="@string/theme_sage"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
 
-        <RadioButton
-            android:id="@+id/themeBlueGold"
+        <TextView
+            android:id="@+id/appSizeOption"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
             android:focusable="true"
+            android:gravity="center_vertical"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="@string/theme_blue_gold"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
 
-        <RadioButton
-            android:id="@+id/themeRedGray"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:focusable="true"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/theme_red_gray"
+        <TextView
+            android:id="@+id/themeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/theme_setting"
             android:textColor="#F4F6FF"
-            android:textSize="18sp" />
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-        <RadioButton
-            android:id="@+id/themeDarkGray"
+        <RadioGroup
+            android:id="@+id/themeRadioGroup"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:focusable="true"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/theme_dark_gray"
-            android:textColor="#F4F6FF"
-            android:textSize="18sp" />
-    </RadioGroup>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="@string/back" />
+            <RadioButton
+                android:id="@+id/themePurple"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/theme_purple"
+                android:textColor="#F4F6FF"
+                android:textSize="18sp" />
 
-</LinearLayout>
+            <RadioButton
+                android:id="@+id/themeSage"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/theme_sage"
+                android:textColor="#F4F6FF"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/themeBlueGold"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/theme_blue_gold"
+                android:textColor="#F4F6FF"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/themeRedGray"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/theme_red_gray"
+                android:textColor="#F4F6FF"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/themeDarkGray"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/theme_dark_gray"
+                android:textColor="#F4F6FF"
+                android:textSize="18sp" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/back" />
+
+    </LinearLayout>
+</ScrollView>
