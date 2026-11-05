@@ -3,7 +3,6 @@ package com.cano.launcher
 import android.view.LayoutInflater
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ItemAppBinding
@@ -11,6 +10,7 @@ import com.cano.launcher.databinding.ItemAppBinding
 class AppAdapter(
     private val onAppSelected: (AppEntry) -> Unit,
     private val onFavoriteToggle: (AppEntry) -> Boolean,
+    private val onGridKey: (KeyEvent) -> Boolean,
     private var palette: ThemePalette
 ) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
@@ -33,6 +33,16 @@ class AppAdapter(
 
     fun getSelectedPosition(): Int = selectedPosition
 
+    fun selectPosition(position: Int) {
+        if (position !in items.indices || position == selectedPosition) return
+        val previous = selectedPosition
+        selectedPosition = position
+        if (previous in items.indices) notifyItemChanged(previous)
+        notifyItemChanged(position)
+    }
+
+    fun getItem(position: Int): AppEntry? = items.getOrNull(position)
+
     fun setPalette(palette: ThemePalette) {
         this.palette = palette
         notifyDataSetChanged()
@@ -54,9 +64,6 @@ class AppAdapter(
     inner class AppViewHolder(
         private val binding: ItemAppBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        private var longPressTriggered = false
-        private var keyDownTime = 0L
-
         fun bind(app: AppEntry, isSelected: Boolean) {
             binding.appIcon.setImageDrawable(app.banner ?: app.icon)
             binding.appIcon.scaleType = if (app.banner != null) {
@@ -74,36 +81,8 @@ class AppAdapter(
                 onFavoriteToggle(app)
                 true
             }
-            binding.root.setOnKeyListener { view, keyCode, event ->
-                if (keyCode != KeyEvent.KEYCODE_DPAD_CENTER &&
-                    keyCode != KeyEvent.KEYCODE_ENTER &&
-                    keyCode != KeyEvent.KEYCODE_MENU &&
-                    keyCode != KeyEvent.KEYCODE_STAR
-                ) {
-                    return@setOnKeyListener false
-                }
-                when (event.action) {
-                    KeyEvent.ACTION_DOWN -> {
-                        if (event.repeatCount == 0) {
-                            keyDownTime = event.downTime
-                            longPressTriggered = false
-                        }
-                        true
-                    }
-                    KeyEvent.ACTION_UP -> {
-                        val duration = event.eventTime - keyDownTime
-                        if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_STAR ||
-                            duration >= ViewConfiguration.getLongPressTimeout()
-                        ) {
-                            onFavoriteToggle(app)
-                            longPressTriggered = true
-                        } else if (!longPressTriggered) {
-                            view.performClick()
-                        }
-                        true
-                    }
-                    else -> false
-                }
+            binding.root.setOnKeyListener { _, _, event ->
+                onGridKey(event)
             }
             binding.root.setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {

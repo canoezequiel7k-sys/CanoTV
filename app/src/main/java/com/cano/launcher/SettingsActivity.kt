@@ -24,6 +24,7 @@ class SettingsActivity : AppCompatActivity() {
             when (settings.themeId) {
                 ThemePalette.SAGE -> binding.themeSage.id
                 ThemePalette.BLUE_GOLD -> binding.themeBlueGold.id
+                ThemePalette.RED_GRAY -> binding.themeRedGray.id
                 else -> binding.themePurple.id
             }
         )
@@ -32,6 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             val themeId = when (checkedId) {
                 binding.themeSage.id -> ThemePalette.SAGE
                 binding.themeBlueGold.id -> ThemePalette.BLUE_GOLD
+                binding.themeRedGray.id -> ThemePalette.RED_GRAY
                 else -> ThemePalette.PURPLE
             }
             settings.themeId = themeId
@@ -48,7 +50,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.favoritesFirstSwitch.setTextColor(palette.text)
         binding.favoritesFirstSummary.setTextColor(palette.muted)
         binding.themeTitle.setTextColor(palette.text)
-        listOf(binding.themePurple, binding.themeSage, binding.themeBlueGold).forEach {
+        listOf(binding.themePurple, binding.themeSage, binding.themeBlueGold, binding.themeRedGray).forEach {
             it.setTextColor(palette.text)
             it.buttonTintList = ColorStateList.valueOf(palette.accent)
         }

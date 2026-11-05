@@ -77,6 +77,14 @@
             android:text="@string/theme_blue_gold"
             android:textColor="#F4F6FF"
             android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/themeRedGray"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_red_gray"
+            android:textColor="#F4F6FF"
+            android:textSize="18sp" />
     </RadioGroup>
 
     <Button

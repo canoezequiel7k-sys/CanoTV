@@ -9,11 +9,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.KeyEvent
+import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnNextLayout
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cano.launcher.databinding.ActivityHomeBinding
 import java.util.concurrent.ExecutorService
@@ -33,6 +35,8 @@ class HomeActivity : AppCompatActivity() {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val loadGeneration = AtomicInteger()
     private var allApps = emptyList<AppEntry>()
+    private var allVisibleApps = emptyList<AppEntry>()
+    private var gridKeyDownTime = 0L
     private var section = Section.HOME
     private var receiverRegistered = false
     private val refreshApps = Runnable { loadApps() }
@@ -52,11 +56,13 @@ class HomeActivity : AppCompatActivity() {
         adapter = AppAdapter(
             onAppSelected = ::launchApp,
             onFavoriteToggle = ::toggleFavorite,
+            onGridKey = ::handleGridKey,
             palette = palette
         )
-        binding.appsRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        binding.appsRecyclerView.layoutManager = GridLayoutManager(this, APP_GRID_COLUMNS)
         binding.appsRecyclerView.adapter = adapter
         binding.appsRecyclerView.setHasFixedSize(true)
+        binding.appsRecyclerView.setOnKeyListener { _, _, event -> handleGridKey(event) }
 
         binding.navHome.setOnClickListener { showSection(Section.HOME) }
         binding.navFavorites.setOnClickListener { showSection(Section.FAVORITES) }
@@ -166,6 +172,7 @@ class HomeActivity : AppCompatActivity() {
         binding.appsTitle.setTextColor(palette.text)
         binding.favoriteHint.setTextColor(palette.muted)
         binding.emptyAppsMessage.setTextColor(palette.muted)
+        binding.appsRecyclerView.setBackgroundColor(palette.gridBackground)
         adapter.setPalette(palette)
     }
 
@@ -183,6 +190,7 @@ class HomeActivity : AppCompatActivity() {
             Section.ALL -> allApps
         }
         adapter.submitItems(visibleApps, favoriteKeys)
+        allVisibleApps = visibleApps
         binding.emptyAppsMessage.visibility =
             if (visibleApps.isEmpty()) View.VISIBLE else View.GONE
         binding.emptyAppsMessage.setText(
@@ -227,7 +235,9 @@ class HomeActivity : AppCompatActivity() {
         retriesRemaining: Int = 4
     ): Boolean {
         if (position == RecyclerView.NO_POSITION) return false
+        adapter.selectPosition(position)
         binding.appsRecyclerView.scrollToPosition(position)
+        binding.appsRecyclerView.requestFocus()
         binding.appsRecyclerView.post {
             val card = binding.appsRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
             if (card != null) {
@@ -244,6 +254,56 @@ class HomeActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    private fun handleGridKey(event: KeyEvent): Boolean {
+        if (event.action != KeyEvent.ACTION_DOWN && event.action != KeyEvent.ACTION_UP) {
+            return false
+        }
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_DPAD_LEFT,
+            KeyEvent.KEYCODE_DPAD_RIGHT,
+            KeyEvent.KEYCODE_DPAD_UP,
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                if (event.action != KeyEvent.ACTION_DOWN) return true
+                val current = adapter.getSelectedPosition()
+                val column = current % APP_GRID_COLUMNS
+                val next = when (event.keyCode) {
+                    KeyEvent.KEYCODE_DPAD_LEFT -> if (column > 0) current - 1 else null
+                    KeyEvent.KEYCODE_DPAD_RIGHT ->
+                        if (column < APP_GRID_COLUMNS - 1) current + 1 else null
+                    KeyEvent.KEYCODE_DPAD_UP ->
+                        if (current >= APP_GRID_COLUMNS) current - APP_GRID_COLUMNS else null
+                    else -> current + APP_GRID_COLUMNS
+                } ?: return false
+                if (next !in allVisibleApps.indices) return false
+                focusFirstApp(next)
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_CENTER,
+            KeyEvent.KEYCODE_ENTER -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    if (event.repeatCount == 0) gridKeyDownTime = event.downTime
+                    return true
+                }
+                val app = allVisibleApps.getOrNull(adapter.getSelectedPosition()) ?: return false
+                return if (event.eventTime - gridKeyDownTime >=
+                    ViewConfiguration.getLongPressTimeout()
+                ) {
+                    toggleFavorite(app)
+                } else {
+                    launchApp(app)
+                    true
+                }
+            }
+            KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_STAR -> {
+                if (event.action == KeyEvent.ACTION_UP) {
+                    allVisibleApps.getOrNull(adapter.getSelectedPosition())?.let(::toggleFavorite)
+                }
+                return true
+            }
+            else -> return false
+        }
     }
 
     private fun showSection(newSection: Section) {
@@ -310,5 +370,9 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showLaunchError() {
         Toast.makeText(this, R.string.app_launch_failed, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        private const val APP_GRID_COLUMNS = 3
     }
 }

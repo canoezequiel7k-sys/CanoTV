@@ -17,6 +17,7 @@ data class ThemePalette(
     val text: Int,
     val muted: Int,
     val overlay: Int,
+    val gridBackground: Int,
     private val density: Float = 1f
 ) {
     fun navigationBackground(): StateListDrawable = StateListDrawable().apply {
@@ -59,11 +60,13 @@ data class ThemePalette(
         const val PURPLE = "purple"
         const val SAGE = "sage"
         const val BLUE_GOLD = "blue_gold"
+        const val RED_GRAY = "red_gray"
 
         fun forId(id: String, density: Float = 1f): ThemePalette {
             val palette = when (id) {
                 SAGE -> sage
                 BLUE_GOLD -> blueGold
+                RED_GRAY -> redGray
                 else -> purple
             }
             return palette.copy(density = density)
@@ -72,17 +75,26 @@ data class ThemePalette(
         private val purple = ThemePalette(
             PURPLE, R.drawable.theme_purple, 0xFF080D1C.toInt(), 0xFF101426.toInt(),
             0xFF19182A.toInt(), 0xFF422345.toInt(), 0xFF61405F.toInt(),
-            0xFFE36AB1.toInt(), 0xFFF8F3FC.toInt(), 0xFFE0D4E8.toInt(), 0x52050915
+            0xFFE36AB1.toInt(), 0xFFF8F3FC.toInt(), 0xFFE0D4E8.toInt(), 0x52050915,
+            0xFF282431.toInt()
         )
         private val sage = ThemePalette(
             SAGE, R.drawable.theme_sage, 0xFF111A17.toInt(), 0xFF14211B.toInt(),
             0xFF1B2921.toInt(), 0xFF354D39.toInt(), 0xFF557354.toInt(),
-            0xFFB6CE83.toInt(), 0xFFF5F6EC.toInt(), 0xFFDCE6D1.toInt(), 0x9907110C.toInt()
+            0xFFB6CE83.toInt(), 0xFFF5F6EC.toInt(), 0xFFDCE6D1.toInt(), 0x9907110C.toInt(),
+            0xFF26312A.toInt()
         )
         private val blueGold = ThemePalette(
             BLUE_GOLD, R.drawable.theme_bluegold, 0xFF07111F.toInt(), 0xFF0B1728.toInt(),
             0xFF14243A.toInt(), 0xFF263B55.toInt(), 0xFF425974.toInt(),
-            0xFFE8B85A.toInt(), 0xFFF2F5FB.toInt(), 0xFFD0DCEB.toInt(), 0x50030A18
+            0xFFE8B85A.toInt(), 0xFFF2F5FB.toInt(), 0xFFD0DCEB.toInt(), 0x50030A18,
+            0xFF202A37.toInt()
+        )
+        private val redGray = ThemePalette(
+            RED_GRAY, R.drawable.theme_redgray, 0xFF171719.toInt(), 0xFF202023.toInt(),
+            0xFF2C2C30.toInt(), 0xFF484044.toInt(), 0xFF68666A.toInt(),
+            0xFFE54B54.toInt(), 0xFFF7F5F5.toInt(), 0xFFD0CDCF.toInt(), 0x710D080A,
+            0xFF353438.toInt()
         )
     }
 }

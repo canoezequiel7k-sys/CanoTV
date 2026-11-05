@@ -286,11 +286,11 @@
             android:id="@+id/appsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:clipToPadding="false"
             android:focusable="true"
-            android:paddingEnd="8dp" />
+            android:padding="6dp" />
 
         <TextView
             android:id="@+id/emptyAppsMessage"
