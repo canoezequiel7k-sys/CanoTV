@@ -65,11 +65,15 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleContext.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        appliedLanguage = settings.language
+        appliedLanguage = resources.configuration.locales[0].language
 
         palette = ThemePalette.forId(settings.themeId, resources.displayMetrics.density)
         adapter = AppAdapter(
@@ -282,7 +286,9 @@ class HomeActivity : AppCompatActivity() {
         val favoriteKeys = favorites.getFavorites()
         val visibleApps = when (section) {
             Section.HOME -> {
-                val homeApps = allApps.filterNot(::isDeviceSettingsApp)
+                val homeApps = allApps.filterNot {
+                    isDeviceSettingsApp(it) || isUnwantedHomeApp(it)
+                }
                 if (settings.favoritesFirst) {
                     homeApps.sortedByDescending {
                         "${it.packageName}/${it.activityName}" in favoriteKeys
@@ -344,9 +350,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun styleLogo() {
-        binding.logoInitial.setTextColor(palette.accent)
+        binding.logoInitial.setTextColor(palette.text)
         binding.logoMiddle.setTextColor(palette.text)
         binding.logoSuffix.setTextColor(palette.accent)
+    }
+
+    private fun isUnwantedHomeApp(app: AppEntry): Boolean {
+        val label = app.label.filter { it.isLetterOrDigit() }.lowercase()
+        val packageName = app.packageName.filter { it.isLetterOrDigit() }.lowercase()
+        return listOf(label, packageName).any {
+            it in UNWANTED_HOME_APPS
+        }
     }
 
     private fun isDeviceSettingsApp(app: AppEntry): Boolean =
@@ -576,6 +590,7 @@ class HomeActivity : AppCompatActivity() {
     companion object {
         private const val APP_GRID_COLUMNS = 3
         private const val SYSTEM_SETTINGS_PACKAGE = "com.android.settings"
+        private val UNWANTED_HOME_APPS = setOf("dlna", "wifidisplay", "mediacenter")
         private val RECOMMENDATION_APP_PACKAGES = setOf(
             "com.netflix.mediaclient",
             "com.google.android.youtube",
